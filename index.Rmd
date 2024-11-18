@@ -1,0 +1,44 @@
+---
+title: "CS201 Flexdashboard Practice"
+author: "Izack Takazawa"
+date: 11/18/2024
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns #can also be rows
+    vertical_layout: fill #can also be scroll
+    source_code: embed
+    theme:
+      bootswatch: yeti
+    navbar:
+    - {title: "Izack Takazawa", href: "https://izacktakazawa.github.io/", align: right}
+    - {icon: "fa fa-github", href: "https://github.com/IzackTakazawa", align: right, target: blank}
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
+
