@@ -16,6 +16,9 @@ output:
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
+library(here)
+library(tidyverse)
+library(janitor)
 ```
 
 Column {data-width=650}
@@ -24,6 +27,35 @@ Column {data-width=650}
 ### Chart A
 
 ```{r}
+
+pitching <- read_csv(here("data/NYM_pitching.csv"))
+
+pitching <- pitching %>%
+  clean_names()
+
+qualified_pitchers <- pitching %>%
+  filter(innings_pitched >= 30) %>%
+  filter(earned_run_average <= 3.00)
+
+top_pitcher <- qualified_pitchers %>%
+  filter(earned_run_average == min(earned_run_average, na.rm = TRUE)) %>%
+  slice(1) 
+# In case of ties, take the first one
+
+# Select relevant statistics to plot
+pitcher_stats <- top_pitcher %>%
+  select(name, earned_run_average, games_played, innings_pitched, walks_allowed, strikeouts) %>%
+  pivot_longer(-name, names_to = "stat", values_to = "value")
+
+# Plot the stats
+ggplot(pitcher_stats, aes(x = stat, y = value, fill = stat)) +
+  geom_col(show.legend = FALSE) +
+  labs(
+    title = paste("Performance of", top_pitcher$name),
+    x = "Statistic",
+    y = "Value"
+  ) +
+  theme_minimal()
 
 ```
 
@@ -39,6 +71,7 @@ Column {data-width=350}
 ### Chart C
 
 ```{r}
+
 
 ```
 
