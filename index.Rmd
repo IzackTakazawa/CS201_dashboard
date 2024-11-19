@@ -21,17 +21,21 @@ library(tidyverse)
 library(janitor)
 ```
 
-Column {data-width=650}
------------------------------------------------------------------------
-
-### Chart A
-
 ```{r}
 
 pitching <- read_csv(here("data/NYM_pitching.csv"))
 
 pitching <- pitching %>%
   clean_names()
+```
+
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
 
 qualified_pitchers <- pitching %>%
   filter(innings_pitched >= 30) %>%

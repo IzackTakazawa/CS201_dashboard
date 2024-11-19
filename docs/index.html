@@ -177,6 +177,7 @@ html, body {
 </div><!--/.container-->
 </div><!--/.navbar-->
 
+<img class="mobile-figure" data-mobile-figure-id=fig1 src="index_files/figure-html/unnamed-chunk-2-1.mb.png" />
 <script type="text/javascript">
 
 
@@ -1858,17 +1859,21 @@ window.FlexDashboardComponents.push({
 
 <div id="dashboard-container">
 
-<div id="row" class="section level2" data-width="650">
-<h2>Row</h2>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+<div id="column" class="section level2" data-width="650">
+<h2>Column</h2>
 <div id="chart-a" class="section level3">
 <h3>Chart A</h3>
 <div class="knitr-options" data-fig-width="576" data-fig-height="460">
 
 </div>
+<p><img src="index_files/figure-html/unnamed-chunk-2-1.png" width="576" data-figure-id=fig1 /></p>
 </div>
 </div>
-<div id="row-1" class="section level2" data-width="350">
-<h2>Row</h2>
+<div id="column-1" class="section level2" data-width="350">
+<h2>Column</h2>
 <div id="chart-b" class="section level3">
 <h3>Chart B</h3>
 <div class="knitr-options" data-fig-width="576" data-fig-height="460">
@@ -1918,18 +1923,54 @@ output:
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
+library(here)
+library(tidyverse)
+library(janitor)
 ```
 
-Row {data-width=650}
+```{r}
+
+pitching &lt;- read_csv(here("data/NYM_pitching.csv"))
+
+pitching &lt;- pitching %&gt;%
+  clean_names()
+```
+
+
+Column {data-width=650}
 -----------------------------------------------------------------------
 
 ### Chart A
 
 ```{r}
 
+qualified_pitchers &lt;- pitching %&gt;%
+  filter(innings_pitched &gt;= 30) %&gt;%
+  filter(earned_run_average &lt;= 3.00)
+
+top_pitcher &lt;- qualified_pitchers %&gt;%
+  filter(earned_run_average == min(earned_run_average, na.rm = TRUE)) %&gt;%
+  slice(1) 
+# In case of ties, take the first one
+
+# Select relevant statistics to plot
+pitcher_stats &lt;- top_pitcher %&gt;%
+  select(name, earned_run_average, games_played, innings_pitched, walks_allowed, strikeouts) %&gt;%
+  pivot_longer(-name, names_to = "stat", values_to = "value")
+
+# Plot the stats
+ggplot(pitcher_stats, aes(x = stat, y = value, fill = stat)) +
+  geom_col(show.legend = FALSE) +
+  labs(
+    title = paste("Performance of", top_pitcher$name),
+    x = "Statistic",
+    y = "Value"
+  ) +
+  theme_minimal()
+
 ```
 
-Row {data-width=350}
+Column {data-width=350}
 -----------------------------------------------------------------------
 
 ### Chart B
@@ -1941,6 +1982,7 @@ Row {data-width=350}
 ### Chart C
 
 ```{r}
+
 
 ```
 
