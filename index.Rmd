@@ -1,14 +1,14 @@
 ---
-title: "CS201 Flexdashboard Practice"
+title: "CS201 Flexdashboard Assignment"
 author: "Izack Takazawa"
-date: 11/18/2024
+date: 11/30/2024
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns #can also be rows
-    vertical_layout: fill #can also be scroll
+    orientation: rows
+    vertical_layout: scroll
     source_code: embed
     theme:
-      bootswatch: yeti
+      bootswatch: flatly
     navbar:
     - {title: "Izack Takazawa", href: "https://izacktakazawa.github.io/", align: right}
     - {icon: "fa fa-github", href: "https://github.com/IzackTakazawa", align: right, target: blank}
@@ -19,63 +19,187 @@ library(flexdashboard)
 library(here)
 library(tidyverse)
 library(janitor)
+library(plotly)
 ```
 
 ```{r}
-
 pitching <- read_csv(here("data/NYM_pitching.csv"))
 
 pitching <- pitching %>%
   clean_names()
 ```
 
-
-Column {data-width=650}
------------------------------------------------------------------------
+## Row {data-width="650"}
 
 ### Chart A
 
 ```{r}
+# Filter data for the deGrom and Scherzer
+degrom_stats <- pitching %>%
+  filter(name == "Jacob deGrom")
 
-qualified_pitchers <- pitching %>%
-  filter(innings_pitched >= 30) %>%
-  filter(earned_run_average <= 3.00)
+scherzer_stats <- pitching %>%
+  filter(name == "Max Scherzer")
 
-top_pitcher <- qualified_pitchers %>%
-  filter(earned_run_average == min(earned_run_average, na.rm = TRUE)) %>%
-  slice(1) 
-# In case of ties, take the first one
+# Combine both pitchers' data so can plot on one graph
+combined_stats <- bind_rows(degrom_stats, scherzer_stats) %>%
+  select(name, year, age, batters_faced, innings_pitched, hits_allowed, home_runs_allowed, earned_run_average, strikeouts, walks_allowed, strikeout_walk_ratio)
 
-# Select relevant statistics to plot
-pitcher_stats <- top_pitcher %>%
-  select(name, earned_run_average, games_played, innings_pitched, walks_allowed, strikeouts) %>%
-  pivot_longer(-name, names_to = "stat", values_to = "value")
+# Find each pitcher's best year (lowest ERA)
+best_year <- combined_stats %>%
+  group_by(name) %>%
+  slice_min(order_by = earned_run_average, n = 1) %>%
+  ungroup()
 
-# Plot the stats
-ggplot(pitcher_stats, aes(x = stat, y = value, fill = stat)) +
-  geom_col(show.legend = FALSE) +
+# Reshape data for plotting
+best_year_plot_data <- best_year %>%
+  pivot_longer(
+    cols = c(batters_faced, innings_pitched, hits_allowed, home_runs_allowed, earned_run_average, strikeouts, walks_allowed, strikeout_walk_ratio),
+    names_to = "stat",
+    values_to = "value"
+  )
+
+# Create the side-by-side bar chart
+best_year_plot <- ggplot(best_year_plot_data, aes(x = stat, y = value, fill = name, text = paste(
+    "Pitcher:", name,
+    "<br>Year:", year, # Include year in hover text
+    "<br>Age:", age,
+    "<br>Statistic:", stat,
+    "<br>Value:", value
+  ))) +
+  geom_col(position = "dodge", show.legend = TRUE) +
+  geom_text(aes(label = value), # Add value above each bar
+            position = position_dodge(width = 0.9), 
+            vjust = -0.5, # Adjust text position above the bar
+            size = 4,) +
   labs(
-    title = paste("Performance of", top_pitcher$name),
+    title = "Comparison of Jacob deGrom and Max Scherzer's Best Years with the Mets",
+    subtitle = "Best years selected based on lowest ERA",
     x = "Statistic",
-    y = "Value"
+    y = "Value",
+    fill = "Pitcher"
   ) +
-  theme_minimal()
+  theme_minimal(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+                               
+    axis.text.y = element_text(size = 14),
+    
+    axis.title.x = element_text(size = 16, face = "bold"),
+    
+    axis.title.y = element_text(size = 16, face = "bold"),
+    
+    plot.title = element_text(size = 20, face = "bold"),  
+    
+    plot.subtitle = element_text(size = 16, face = "italic"),  
+    
+    legend.title = element_text(size = 14),  
+    
+    legend.text = element_text(size = 12),
+    
+    plot.caption = element_text(size = 8, hjust = 0.5, vjust = -1)
+  ) +
+  scale_fill_brewer(palette = "Set2")
+
+#Convert to interactive plot using ggplotly
+interactive_plot <- ggplotly(best_year_plot, tooltip = "text")
+
+# Render the interactive plot
+interactive_plot
 
 ```
 
-Column {data-width=350}
------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+## Row {data-width="350"}
 
 ### Chart B
 
 ```{r}
+jacob_degrom <- pitching %>%
+  filter(name == "Jacob deGrom")
+
+pitcher_stats <- jacob_degrom %>%
+  select(year, age, batters_faced, innings_pitched, hits_allowed, home_runs_allowed, earned_run_average, strikeouts, walks_allowed, strikeout_walk_ratio) %>%
+  pivot_longer(cols = c(-year, -age), names_to = "stat", values_to = "value")
+
+# Visualize the data
+degrom_interactive <- ggplot(pitcher_stats, aes(x = stat, y = value, fill = stat, text = paste(
+    "<br>Age:", age,
+    "<br>Statistic:", stat,
+    "<br>Value:", value)))+
+      
+  geom_col(show.legend = FALSE, position = "dodge") +
+  facet_wrap(~year) +  # If multiple years are present, create separate panels for each year
+  scale_fill_brewer(palette = "Set3") +  # Use a visually appealing color palette
+  labs(
+    title = "Performance of Jacob deGrom with the Mets",
+    x = "Statistic",
+    y = "Value"
+  ) +
+  theme_minimal(base_size = 14) +  # Clean and modern theme
+  theme(
+    axis.text.x = element_text(angle = 65, hjust = 1, size = 6),
+    axis.text.y = element_text(size = 8),  # Shrink y-axis label text size
+    axis.title.x = element_text(size = 10),  # Shrink x-axis title text size
+    axis.title.y = element_text(size = 10),  # Shrink y-axis title text size
+    strip.text = element_text(size = 10)
+        )  # Rotate x-axis labels for readability
+
+#Convert to interactive plot using ggplotly
+interactive_degrom_plot <- ggplotly(degrom_interactive, tooltip = "text")
+
+# Render the interactive plot
+interactive_degrom_plot
 
 ```
 
 ### Chart C
 
 ```{r}
+max_scher <- pitching %>%
+  filter(name == "Max Scherzer")
+
+pitcher_stats <- max_scher %>%
+  select(year, age, batters_faced, innings_pitched, hits_allowed, home_runs_allowed, earned_run_average, strikeouts, walks_allowed, strikeout_walk_ratio) %>%
+  pivot_longer(cols = c(-year, -age), names_to = "stat", values_to = "value")
+
+# Visualize the data
+scher_interactive <- ggplot(pitcher_stats, aes(x = stat, y = value, fill = stat, text = paste(
+    "<br>Age:", age,
+    "<br>Statistic:", stat,
+    "<br>Value:", value)))+
+      
+  geom_col(show.legend = FALSE, position = "dodge") +
+  facet_wrap(~year) +  # If multiple years are present, create separate panels for each year
+  scale_fill_brewer(palette = "Set3") +  # Use a visually appealing color palette
+  labs(
+    title = "Performance of Max Scherzer with the Mets",
+    x = "Statistic",
+    y = "Value"
+  ) +
+  theme_minimal(base_size = 14) +  # Clean and modern theme
+  theme(
+    axis.text.x = element_text(angle = 65, hjust = 1, size = 6),
+    axis.text.y = element_text(size = 8),  # Shrink y-axis label text size
+    axis.title.x = element_text(size = 10),  # Shrink x-axis title text size
+    axis.title.y = element_text(size = 10),  # Shrink y-axis title text size
+    strip.text = element_text(size = 10)
+        )  # Rotate x-axis labels for readability
+
+#Convert to interactive plot using ggplotly
+interactive_scher_plot <- ggplotly(scher_interactive, tooltip = "text")
+
+# Render the interactive plot
+interactive_scher_plot
 
 
 ```
+
+---------
+
+<footer style="position: fixed; bottom: 0; width: 100%; background-color: #f9f9f9; border-top: 1px solid #ddd; padding: 10px; text-align: center; font-size: 12px; color: #555;">
+  Data Source: <a href="https://www.kaggle.com/datasets/mattop/new-york-mets-batting-and-pitching-1962-2023" target="_blank">Matt OP's New York Mets Pitching Data (1962 - 2023)</a>
+</footer>
 
