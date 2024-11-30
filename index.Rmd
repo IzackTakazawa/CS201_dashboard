@@ -34,7 +34,6 @@ pitching <- pitching %>%
 ### Chart A
 
 ```{r}
-# Filter data for the deGrom and Scherzer
 degrom_stats <- pitching %>%
   filter(name == "Jacob deGrom")
 
@@ -59,18 +58,18 @@ best_year_plot_data <- best_year %>%
     values_to = "value"
   )
 
-# Create the side-by-side bar chart
+# Plot
 best_year_plot <- ggplot(best_year_plot_data, aes(x = stat, y = value, fill = name, text = paste(
     "Pitcher:", name,
-    "<br>Year:", year, # Include year in hover text
+    "<br>Year:", year,
     "<br>Age:", age,
     "<br>Statistic:", stat,
     "<br>Value:", value
   ))) +
   geom_col(position = "dodge", show.legend = TRUE) +
-  geom_text(aes(label = value), # Add value above each bar
+  geom_text(aes(label = value),
             position = position_dodge(width = 0.9), 
-            vjust = -0.5, # Adjust text position above the bar
+            vjust = -0.5,
             size = 4,) +
   labs(
     title = "Comparison of Jacob deGrom and Max Scherzer's Best Years with the Mets",
@@ -101,10 +100,9 @@ best_year_plot <- ggplot(best_year_plot_data, aes(x = stat, y = value, fill = na
   ) +
   scale_fill_brewer(palette = "Set2")
 
-#Convert to interactive plot using ggplotly
+#plotly
 interactive_plot <- ggplotly(best_year_plot, tooltip = "text")
 
-# Render the interactive plot
 interactive_plot
 
 ```
@@ -124,33 +122,36 @@ pitcher_stats <- jacob_degrom %>%
   select(year, age, batters_faced, innings_pitched, hits_allowed, home_runs_allowed, earned_run_average, strikeouts, walks_allowed, strikeout_walk_ratio) %>%
   pivot_longer(cols = c(-year, -age), names_to = "stat", values_to = "value")
 
-# Visualize the data
+# Plot
 degrom_interactive <- ggplot(pitcher_stats, aes(x = stat, y = value, fill = stat, text = paste(
     "<br>Age:", age,
     "<br>Statistic:", stat,
     "<br>Value:", value)))+
       
   geom_col(show.legend = FALSE, position = "dodge") +
-  facet_wrap(~year) +  # If multiple years are present, create separate panels for each year
-  scale_fill_brewer(palette = "Set3") +  # Use a visually appealing color palette
+  facet_wrap(~year) +  
+  scale_fill_brewer(palette = "Set3") + 
   labs(
     title = "Performance of Jacob deGrom with the Mets",
     x = "Statistic",
     y = "Value"
   ) +
-  theme_minimal(base_size = 14) +  # Clean and modern theme
+  theme_minimal(base_size = 14) + 
   theme(
     axis.text.x = element_text(angle = 65, hjust = 1, size = 6),
-    axis.text.y = element_text(size = 8),  # Shrink y-axis label text size
-    axis.title.x = element_text(size = 10),  # Shrink x-axis title text size
-    axis.title.y = element_text(size = 10),  # Shrink y-axis title text size
+    
+    axis.text.y = element_text(size = 8),  
+    
+    axis.title.x = element_text(size = 10),  
+    
+    axis.title.y = element_text(size = 10), 
+    
     strip.text = element_text(size = 10)
-        )  # Rotate x-axis labels for readability
+        )  
 
-#Convert to interactive plot using ggplotly
+#plotly
 interactive_degrom_plot <- ggplotly(degrom_interactive, tooltip = "text")
 
-# Render the interactive plot
 interactive_degrom_plot
 
 ```
@@ -165,35 +166,37 @@ pitcher_stats <- max_scher %>%
   select(year, age, batters_faced, innings_pitched, hits_allowed, home_runs_allowed, earned_run_average, strikeouts, walks_allowed, strikeout_walk_ratio) %>%
   pivot_longer(cols = c(-year, -age), names_to = "stat", values_to = "value")
 
-# Visualize the data
+#Plot
 scher_interactive <- ggplot(pitcher_stats, aes(x = stat, y = value, fill = stat, text = paste(
     "<br>Age:", age,
     "<br>Statistic:", stat,
     "<br>Value:", value)))+
       
   geom_col(show.legend = FALSE, position = "dodge") +
-  facet_wrap(~year) +  # If multiple years are present, create separate panels for each year
-  scale_fill_brewer(palette = "Set3") +  # Use a visually appealing color palette
+  facet_wrap(~year) +  
+  scale_fill_brewer(palette = "Set3") + 
   labs(
     title = "Performance of Max Scherzer with the Mets",
     x = "Statistic",
     y = "Value"
   ) +
-  theme_minimal(base_size = 14) +  # Clean and modern theme
+  theme_minimal(base_size = 14) +  
   theme(
     axis.text.x = element_text(angle = 65, hjust = 1, size = 6),
-    axis.text.y = element_text(size = 8),  # Shrink y-axis label text size
-    axis.title.x = element_text(size = 10),  # Shrink x-axis title text size
-    axis.title.y = element_text(size = 10),  # Shrink y-axis title text size
+    
+    axis.text.y = element_text(size = 8), 
+    
+    axis.title.x = element_text(size = 10),  
+    
+    axis.title.y = element_text(size = 10),  
+    
     strip.text = element_text(size = 10)
-        )  # Rotate x-axis labels for readability
+        )  
 
-#Convert to interactive plot using ggplotly
+#plotly
 interactive_scher_plot <- ggplotly(scher_interactive, tooltip = "text")
 
-# Render the interactive plot
 interactive_scher_plot
-
 
 ```
 
