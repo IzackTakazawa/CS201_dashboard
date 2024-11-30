@@ -73,9 +73,8 @@ best_year_plot <- ggplot(best_year_plot_data, aes(x = stat, y = value, fill = na
             size = 4,) +
   labs(
     title = "Comparison of Jacob deGrom and Max Scherzer",
-    subtitle = "Best years selected based on lowest ERA",
-    x = "Statistic",
-    y = "Value",
+    x = "Statistics",
+    y = "Values",
     fill = "Pitcher"
   ) +
   theme_minimal(base_size = 14) +
