@@ -31,7 +31,7 @@ pitching <- pitching %>%
 
 ## Row {data-width="650"}
 
-### Chart A
+### Jacob deGrom and Max Scherzer's Best Years with the Mets Combined Graph
 
 ```{r}
 degrom_stats <- pitching %>%
@@ -72,7 +72,7 @@ best_year_plot <- ggplot(best_year_plot_data, aes(x = stat, y = value, fill = na
             vjust = -0.5,
             size = 4,) +
   labs(
-    title = "Comparison of Jacob deGrom and Max Scherzer's Best Years with the Mets",
+    title = "Comparison of Jacob deGrom and Max Scherzer",
     subtitle = "Best years selected based on lowest ERA",
     x = "Statistic",
     y = "Value",
@@ -112,7 +112,7 @@ interactive_plot
 
 ## Row {data-width="350"}
 
-### Chart B
+### Jacob deGrom's Career with the Mets
 
 ```{r}
 jacob_degrom <- pitching %>%
@@ -132,9 +132,9 @@ degrom_interactive <- ggplot(pitcher_stats, aes(x = stat, y = value, fill = stat
   facet_wrap(~year) +  
   scale_fill_brewer(palette = "Set3") + 
   labs(
-    title = "Performance of Jacob deGrom with the Mets",
-    x = "Statistic",
-    y = "Value"
+    title = "Jacob deGrom with the Mets",
+    x = "Statistics",
+    y = "Values"
   ) +
   theme_minimal(base_size = 14) + 
   theme(
@@ -156,7 +156,7 @@ interactive_degrom_plot
 
 ```
 
-### Chart C
+### Max Scherzer's Career with the Mets
 
 ```{r}
 max_scher <- pitching %>%
@@ -176,9 +176,9 @@ scher_interactive <- ggplot(pitcher_stats, aes(x = stat, y = value, fill = stat,
   facet_wrap(~year) +  
   scale_fill_brewer(palette = "Set3") + 
   labs(
-    title = "Performance of Max Scherzer with the Mets",
-    x = "Statistic",
-    y = "Value"
+    title = "Max Scherzer with the Mets",
+    x = "Statistics",
+    y = "Values"
   ) +
   theme_minimal(base_size = 14) +  
   theme(
