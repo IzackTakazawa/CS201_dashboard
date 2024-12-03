@@ -49,7 +49,7 @@ degrom_stats <- pitching %>%
 scherzer_stats <- pitching %>%
   filter(name == "Max Scherzer")
 
-# Combine both pitchers' data so can plot on one graph
+# Combine both deGrom and Scherzers data and rename
 combined_stats <- bind_rows(degrom_stats, scherzer_stats) %>%
   select(name, year, age, batters_faced, innings_pitched, hits_allowed, home_runs_allowed, earned_run_average, strikeouts, walks_allowed, strikeout_walk_ratio) %>%
   rename(
@@ -65,13 +65,13 @@ combined_stats <- bind_rows(degrom_stats, scherzer_stats) %>%
     `Walks Allowed` = walks_allowed,
     `Strikeout Walk Ratio` = strikeout_walk_ratio
   )
-# Find each pitcher's best year (lowest ERA)
+# Find each pitcher's best year based on lowest ERA
 best_year <- combined_stats %>%
   group_by(Name) %>%
   slice_min(order_by = `Earned Run Average`, n = 1) %>%
   ungroup()
 
-# Reshape data for plotting
+
 best_year_plot_data <- best_year %>%
   pivot_longer(
     cols = -c(Name, Year, Age),
